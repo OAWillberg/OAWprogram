@@ -1,7 +1,339 @@
-<!doctype html><html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OAWProgram</title>
-<style>body{font-family:Arial;background:#f4f4f4;margin:0}.box{max-width:700px;margin:50px auto;background:#fff;padding:30px;border-radius:16px;box-shadow:0 5px 25px #0001}.body{white-space:pre-wrap;line-height:1.7;font-size:18px}.date{color:#666}</style></head>
-<body><div class="box"><h1 id="title">OAWProgram</h1><div id="date" class="date"></div><div id="body">Ladataan...</div></div>
+<!doctype html>
+
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>OAWProgram</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+}
+
+.box {
+  max-width: 700px;
+  margin: 30px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 5px 25px #0001;
+}
+
+h1 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.date {
+  color: #666;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.navigation {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+button {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #222;
+  color: white;
+}
+
+button:hover {
+  background: #444;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.today-button {
+  background: #666;
+}
+
+.calendar {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 16px;
+  margin-bottom: 25px;
+}
+
+.program-title {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.body {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 18px;
+}
+
+.status {
+  text-align: center;
+  color: #777;
+  margin: 20px 0;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  .box {
+    margin: 10px auto;
+    padding: 20px;
+  }
+
+  .navigation {
+    gap: 6px;
+  }
+
+  button {
+    padding: 12px 5px;
+    font-size: 14px;
+  }
+
+  .body {
+    font-size: 17px;
+  }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+  <h1>OAWProgram</h1>
+
+  <div class="navigation">
+    <button id="prevButton">‹ Edellinen</button>
+    <button id="todayButton" class="today-button">Tänään</button>
+    <button id="nextButton">Seuraava ›</button>
+  </div>
+
+<input
+type="date"
+id="calendar"
+class="calendar"
+
+>
+
+  <div id="date" class="date"></div>
+
+  <h2 id="title" class="program-title">Ladataan...</h2>
+
+  <div id="body" class="body">
+    Ladataan...
+  </div>
+
+</div>
+
 <script>
-function today(){let p=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Helsinki",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),o={};p.forEach(x=>o[x.type]=x.value);return o.year+"-"+o.month+"-"+o.day}
-async function load(){let d=today(),j=await fetch("data/texts.json?"+Date.now()).then(r=>r.json()),x=j[d];date.textContent=new Intl.DateTimeFormat("fi-FI",{dateStyle:"full"}).format(new Date(d+"T12:00:00"));title.textContent=x?.title||"OAWProgram";body.textContent=x?.body||"Tälle päivälle ei ole vielä tekstiä."}load();setInterval(load,60000);
-</script></div></body></html>
+
+let texts = {};
+let selectedDate = null;
+
+
+/* Suomen tämänhetkinen päivämäärä */
+function today() {
+
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Helsinki",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+
+  const o = {};
+
+  parts.forEach(x => {
+    o[x.type] = x.value;
+  });
+
+  return `${o.year}-${o.month}-${o.day}`;
+}
+
+
+/* Päivämäärän muuttaminen */
+function changeDate(days) {
+
+  const date = new Date(selectedDate + "T12:00:00");
+
+  date.setDate(date.getDate() + days);
+
+  selectedDate =
+    date.getFullYear() +
+    "-" +
+    String(date.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(date.getDate()).padStart(2, "0");
+
+  showDate();
+}
+
+
+/* Näytä valittu päivä */
+function showDate() {
+
+  const calendar = document.getElementById("calendar");
+  const dateElement = document.getElementById("date");
+  const titleElement = document.getElementById("title");
+  const bodyElement = document.getElementById("body");
+
+  calendar.value = selectedDate;
+
+  const dateObject =
+    new Date(selectedDate + "T12:00:00");
+
+  dateElement.textContent =
+    new Intl.DateTimeFormat("fi-FI", {
+      dateStyle: "full"
+    }).format(dateObject);
+
+  const program = texts[selectedDate];
+
+  if (program) {
+
+    titleElement.textContent =
+      program.title || "OAWProgram";
+
+    bodyElement.textContent =
+      program.body || "Tälle päivälle ei ole ohjelmaa.";
+
+  } else {
+
+    titleElement.textContent =
+      "Ei ohjelmaa";
+
+    bodyElement.textContent =
+      "Tälle päivälle ei ole vielä ohjelmaa.";
+
+  }
+}
+
+
+/* Lataa ohjelmat */
+async function load() {
+
+  try {
+
+    const response =
+      await fetch("data/texts.json?" + Date.now());
+
+    if (!response.ok) {
+      throw new Error("Ohjelmatiedoston lataus epäonnistui.");
+    }
+
+    texts = await response.json();
+
+    /*
+      Ensimmäisellä latauksella näytetään tämänhetkinen päivä.
+      Sen jälkeen käyttäjän valitsema päivä säilytetään.
+    */
+    if (!selectedDate) {
+      selectedDate = today();
+    }
+
+    showDate();
+
+  } catch (error) {
+
+    document.getElementById("title").textContent =
+      "Virhe";
+
+    document.getElementById("body").textContent =
+      "Ohjelman lataaminen epäonnistui.";
+
+    console.error(error);
+  }
+}
+
+
+/* Edellinen päivä */
+document
+  .getElementById("prevButton")
+  .addEventListener("click", function() {
+
+    changeDate(-1);
+
+  });
+
+
+/* Seuraava päivä */
+document
+  .getElementById("nextButton")
+  .addEventListener("click", function() {
+
+    changeDate(1);
+
+  });
+
+
+/* Takaisin tähän päivään */
+document
+  .getElementById("todayButton")
+  .addEventListener("click", function() {
+
+    selectedDate = today();
+
+    showDate();
+
+  });
+
+
+/* Kalenterista valittu päivä */
+document
+  .getElementById("calendar")
+  .addEventListener("change", function() {
+
+    if (this.value) {
+
+      selectedDate = this.value;
+
+      showDate();
+
+    }
+
+  });
+
+
+/* Lataa heti */
+load();
+
+
+/*
+  Tarkista uudet ohjelmat minuutin välein.
+  Päivämäärää ei kuitenkaan vaihdeta käyttäjän alta,
+  jos hän selaa jotain muuta päivää.
+*/
+setInterval(load, 60000);
+
+</script>
+
+</body>
+</html>
