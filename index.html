@@ -1,0 +1,7 @@
+<!doctype html><html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OAWProgram</title>
+<style>body{font-family:Arial;background:#f4f4f4;margin:0}.box{max-width:700px;margin:50px auto;background:#fff;padding:30px;border-radius:16px;box-shadow:0 5px 25px #0001}.body{white-space:pre-wrap;line-height:1.7;font-size:18px}.date{color:#666}</style></head>
+<body><div class="box"><h1 id="title">OAWProgram</h1><div id="date" class="date"></div><div id="body">Ladataan...</div></div>
+<script>
+function today(){let p=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Helsinki",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),o={};p.forEach(x=>o[x.type]=x.value);return o.year+"-"+o.month+"-"+o.day}
+async function load(){let d=today(),j=await fetch("data/texts.json?"+Date.now()).then(r=>r.json()),x=j[d];date.textContent=new Intl.DateTimeFormat("fi-FI",{dateStyle:"full"}).format(new Date(d+"T12:00:00"));title.textContent=x?.title||"OAWProgram";body.textContent=x?.body||"Tälle päivälle ei ole vielä tekstiä."}load();setInterval(load,60000);
+</script></div></body></html>
