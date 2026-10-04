@@ -1,6 +1,30 @@
 {
-  "2026-10-04": {
-    "title": "Tervetuloa OAWProgramiin",
-    "body": "Tämä on esimerkkiteksti. Muokkaa tai poista tämä data/texts.json-tiedostosta."
+  "2026-10-05": {
+    "title": "MAANANTAI",
+    "body": "1/7\nA) EVERY 01:30 X 5 SETS\n2 CLEAN + 2 JERK\n\nB) ON A 15:00 RUNNING CLOCK... (E2MOM)\nFIND A HEAVY 1 REP MAX CLEAN & JERK\n\nC) 3 ROUNDS FOR QUALITY:\n20 GHD SIT UPS\n7 STRICT PULL UPS + 0:30 BAR HANG\n"
+  },
+  "2026-10-06": {
+    "title": "TIISTAI",
+    "body": "JOS NIITISSÄ PIDÄ VAPAA\n\nJOS EI - MODERANTTIA BODAILUA"
+  },
+  "2026-10-07": {
+    "title": "KESKIVIIKKO",
+    "body": "A) ALTERNATING MINUTES X 12 MINUTES\n\nODD: 4 AXLE BAR STRICT PRESS \nEVEN: 8 AXLE BAR DEADLIFTS (CONTROLLED) \n\nB) ALTERNATING MINUTES X 12 MINUTES\n\nODD: 4 BENCH PRESS \nEVEN: 16 CTB PULL UPS\n\nC) 4 X 25 GHD SIT UPS\n"
+  },
+  "2026-10-08": {
+    "title": "TORSTAI",
+    "body": "VAPAA\n"
+  },
+  "2026-10-09": {
+    "title": "PERJANTAI",
+    "body": "A) BACK SQUATS\n\nBUILD TO A SINGLE AT 80-85% (145KG 2.10.)\n\n4 X 5 REPS @ 73% (ALL SETS AT THE SAME WEIGHT)\n\nB) 5 ROUNDS – REST 1:1\n\n3 POWER CLEANS\n6 BURPEES OVER BAR\n9 HSPU\n\nC) 4 X 25 GHD BACK EXTENSION\n"
+  },
+  "2026-10-10": {
+    "title": "LAUANTAI",
+    "body": "VAPAATA TAI HYPPÄÄ JOHONKIN \n"
+  },
+  "2026-10-11": {
+    "title": "SUNNUNTAI",
+    "body": "VAPAA"
   }
 }
