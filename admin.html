@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OAWProgram – Ylläpito</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f2f4f7;color:#222}
+.box{max-width:760px;margin:30px auto;background:#fff;padding:28px;border-radius:16px;box-shadow:0 4px 20px #0001}
+h1{margin-top:0}.help{color:#666;line-height:1.5}
+label{display:block;font-weight:bold;margin:18px 0 7px}
+input,textarea{width:100%;padding:13px;border:1px solid #aaa;border-radius:9px;font:inherit}
+textarea{min-height:220px;resize:vertical}
+button{padding:12px 17px;margin:16px 8px 0 0;border:0;border-radius:9px;font-size:16px;cursor:pointer}
+.primary{background:#222;color:#fff}.secondary{background:#ddd;color:#222}.danger{background:#b42318;color:#fff}
+.status{margin-top:18px;padding:12px;border-radius:9px;background:#eaf5ea;display:none}
+.item{display:flex;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid #eee;align-items:center}
+.item button{margin:0;padding:8px 11px;font-size:14px}
+.small{font-size:14px;color:#666}
+.preview{display:none;margin-top:20px;padding:20px;background:#f7f7f7;border-radius:10px}
+.previewtext{white-space:pre-wrap;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>OAWProgram – ylläpito</h1>
+<p class="help">Valitse päivä, kirjoita otsikko ja päivän teksti. Tallenna sitten päivä ja lataa valmis <b>texts.json</b> GitHubia varten.</p>
+
+<label for="day">📅 Päivä</label>
+<input id="day" type="date">
+
+<label for="title">Otsikko</label>
+<input id="title" type="text" placeholder="Kirjoita otsikko tähän">
+
+<label for="body">Teksti</label>
+<textarea id="body" placeholder="Kirjoita päivän teksti tähän..."></textarea>
+
+<button class="primary" id="saveBtn">💾 Tallenna päivä</button>
+<button class="primary" id="downloadBtn">⬇️ Lataa valmis texts.json</button>
+<button class="secondary" id="previewBtn">👀 Esikatsele</button>
+<button class="secondary" id="clearBtn">Tyhjennä</button>
+
+<div id="status" class="status"></div>
+
+<div id="preview" class="preview">
+<h2 id="previewTitle"></h2>
+<div id="previewBody" class="previewtext"></div>
+</div>
+
+<hr>
+<h2>Tallennetut päivät</h2>
+<p class="small">Tallennetut päivät säilyvät tässä selaimessa. Lataa lopuksi valmis texts.json ja päivitä se GitHubissa.</p>
+<div id="list"></div>
+</div>
+
+<script>
+const KEY="oawprogram_admin_final_v1";
+let data={};
+
+const day=document.getElementById("day");
+const title=document.getElementById("title");
+const body=document.getElementById("body");
+const list=document.getElementById("list");
+const statusBox=document.getElementById("status");
+
+function loadData(){
+ try{data=JSON.parse(localStorage.getItem(KEY)||"{}");}
+ catch(e){data={};}
+ renderList();
+}
+
+function showStatus(msg){
+ statusBox.textContent=msg;
+ statusBox.style.display="block";
+ setTimeout(()=>statusBox.style.display="none",3000);
+}
+
+function saveDay(){
+ if(!day.value){alert("Valitse ensin päivä.");day.focus();return;}
+ data[day.value]={title:title.value.trim(),body:body.value};
+ localStorage.setItem(KEY,JSON.stringify(data));
+ renderList();
+ showStatus("Päivä tallennettu. Nyt voit ladata texts.json-tiedoston.");
+}
+
+function downloadJson(){
+ const json=JSON.stringify(data,null,2)+"\n";
+ const blob=new Blob([json],{type:"application/json;charset=utf-8"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="texts.json";
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+ showStatus("texts.json ladattu. Seuraavaksi päivitä se GitHubissa.");
+}
+
+function editDay(d){
+ day.value=d;
+ title.value=data[d]?.title||"";
+ body.value=data[d]?.body||"";
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function deleteDay(d){
+ if(!confirm("Poistetaanko päivän "+d+" teksti?"))return;
+ delete data[d];
+ localStorage.setItem(KEY,JSON.stringify(data));
+ renderList();
+ showStatus("Päivä poistettu.");
+}
+
+function clearFields(){
+ day.value="";
+ title.value="";
+ body.value="";
+ document.getElementById("preview").style.display="none";
+}
+
+function previewDay(){
+ if(!day.value){alert("Valitse ensin päivä.");return;}
+ document.getElementById("previewTitle").textContent=title.value||"OAWProgram";
+ document.getElementById("previewBody").textContent=body.value||"(Ei tekstiä)";
+ document.getElementById("preview").style.display="block";
+}
+
+function renderList(){
+ list.innerHTML="";
+ const dates=Object.keys(data).sort();
+ if(!dates.length){
+  list.innerHTML="<p class='small'>Ei vielä tallennettuja päiviä.</p>";
+  return;
+ }
+ dates.forEach(d=>{
+  const row=document.createElement("div");
+  row.className="item";
+  const info=document.createElement("span");
+  info.textContent=d+" – "+(data[d].title||"(Ei otsikkoa)");
+  const edit=document.createElement("button");
+  edit.className="secondary";
+  edit.textContent="Muokkaa";
+  edit.onclick=()=>editDay(d);
+  const del=document.createElement("button");
+  del.className="danger";
+  del.textContent="Poista";
+  del.onclick=()=>deleteDay(d);
+  row.append(info,edit,del);
+  list.appendChild(row);
+ });
+}
+
+document.getElementById("saveBtn").onclick=saveDay;
+document.getElementById("downloadBtn").onclick=downloadJson;
+document.getElementById("previewBtn").onclick=previewDay;
+document.getElementById("clearBtn").onclick=clearFields;
+
+loadData();
+</script>
+</body>
+</html>
